@@ -1,10 +1,6 @@
 # cs506
 CS 506 Project
 
-Below is a revised project proposal that explicitly states you will use Python, the OpenWeatherMap One Call 3 API, and Bluebikes trip history data:
-
----
-
 # Bike-Share Demand Prediction Project Proposal
 
 ## Project Description
