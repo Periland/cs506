@@ -81,5 +81,3 @@ This project aims to build a predictive model for bike-share usage by integratin
   - **Week 7-8:** Documentation, Final refinements, evaluation, and preparation for project submission.
 
 ---
-
-This revised proposal clearly states the use of Python, the OpenWeatherMap One Call 3 API, and Bluebikes trip history data as the core components of your data science project.
