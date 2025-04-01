@@ -1,79 +1,26 @@
-# cs506
-CS 506 Project
+# Video link: https://youtu.be/t9maCmvRA4U
 
-# Bike-Share Demand Prediction Project Proposal
+# Bluebikes Hourly Trip Prediction  
+*Predicting hourly bike-share ridership using weather and time features*
 
-## Project Description
+## Overview  
+I am developing a model to predict the number of Bluebikes trips each hour using historical usage and weather data. The goal is to capture how factors like time of day and weather conditions influence bike-share demand. So far, I have built a data processing pipeline and a deep learning model that demonstrates the feasibility of these predictions.
 
-This project aims to build a predictive model for bike-share usage by integrating historical Bluebikes trip data with weather information. We will use Python to develop a full data pipeline—from data ingestion and cleaning through feature engineering, exploratory analysis, and modeling—to forecast bike-share demand. By merging Bluebikes trip history data (available at [Hubway Data](https://s3.amazonaws.com/hubway-data/index.html)) with weather data obtained via the [OpenWeatherMap One Call 3 API](https://openweathermap.org/api/one-call-3), our goal is to understand how weather conditions and temporal factors influence bike usage and to develop a robust, reproducible prediction system.
+## Data  
+I aggregated the historical trip data from the Hubway/Bluebikes bike-share system on an hourly basis. Each hourly record includes the trip count along with weather metrics (temperature, humidity, precipitation, etc.) retrieved from the OpenWeather One Call API, matched by timestamp. I also added basic time attributes (e.g. hour of day, day of week, and a weekend indicator) to the dataset. The model uses a rolling window of the past 12 hours of data as input features to predict the next hour’s trip count.
 
-## Project Goals
+## Model  
+My predictive model uses a bidirectional LSTM network with an attention mechanism for sequence-to-one forecasting. It processes sequences of the last 12 hours of data and outputs a single prediction for the next hour. The attention layer helps the model focus on the most relevant time steps in the input sequence. To account for different ridership patterns on weekdays versus weekends, I trained two separate LSTM models and combined them as an ensemble (selecting the weekday model or weekend model based on the day type).
 
-- **Primary Goal:**  
-  Accurately predict bike-share demand (i.e., the number of trips or bike rentals) based on weather conditions, time of day, and other contextual features using a Python-based modeling approach.
+## Results  
+- **Training History:** The training history plot shows the model’s loss steadily decreasing and converging after around 20 epochs, with training and validation curves closely tracking each other (indicating minimal overfitting).  
+  ![Training History](training_history.png)  
+- **Feature Importance:** The feature importance plot suggests that time-based features (such as hour of day and whether it is a weekend) and key weather features (like temperature) had the greatest influence on the predictions.  
+  ![Feature Importance](feature_importance.png)  
+- **Residual Plot:** The residual plot indicates that prediction errors are mostly centered around zero, with no strong bias. A few larger errors occur during periods of unusual or peak usage, but overall the residuals are fairly well-distributed.  
+  ![Residual Plot](residual_plot.png)  
+- **Prediction Results:** The prediction results plot shows that the model’s forecasts closely follow the actual trip counts over time. The model captures the daily usage trends and peaks reasonably well, though it sometimes underestimates sudden spikes in demand.  
+  ![Prediction Results](prediction_results.png)  
 
-- **Secondary Goals:**  
-  - Analyze the influence of external factors—such as temperature, precipitation, and wind speed—on bike-share usage.
-  - Build a reproducible data pipeline that automates data collection, cleaning, feature extraction, visualization, and model training.
-  - Compare multiple regression and ensemble models (e.g., linear regression, random forests, gradient boosting) to evaluate their performance.
-  - Implement unit tests and continuous integration using GitHub Actions to ensure code quality and reproducibility.
-
-## Data Collection
-
-- **Bluebikes Trip History Data:**  
-  - **Source:** Bluebikes (formerly Hubway) trip history data is available at [Hubway Data](https://s3.amazonaws.com/hubway-data/index.html).  
-  - **Method:** Download the historical trip data files (typically in CSV format) which include trip start and end times, station IDs, and user information.
-
-- **Weather Data:**  
-  - **Source:** OpenWeatherMap One Call 3 API ([https://openweathermap.org/api/one-call-3](https://openweathermap.org/api/one-call-3)).  
-  - **Method:** Use Python’s HTTP libraries (e.g., `requests`) to query the One Call 3 API for historical weather conditions (such as temperature, precipitation, wind speed, etc.) corresponding to the dates and times in the Bluebikes dataset.
-
-## Data Cleaning and Feature Extraction
-
-- **Data Cleaning:**  
-  - Use Python’s **pandas** library to load, inspect, and clean both datasets.  
-  - Parse and standardize timestamp fields, align trip data with corresponding weather observations, and handle missing or inconsistent values.
-
-- **Feature Extraction:**  
-  - Derive time-based features (hour, day of week, month, holiday flag) from the Bluebikes trip timestamps.  
-  - Extract relevant weather features (temperature, precipitation, wind speed, humidity, etc.) from the OpenWeatherMap API responses.  
-  - Engineer additional features, such as moving averages or interaction terms between weather and time, to capture seasonal and daily patterns.
-
-## Modeling Approach
-
-- **Techniques:**  
-  - Begin with baseline models using linear regression to set a performance benchmark.
-  - Explore more advanced ensemble methods like random forests and gradient boosting (using libraries such as scikit-learn, XGBoost, or LightGBM) to capture non-linear relationships.
-  - Evaluate model performance using regression metrics such as Root Mean Squared Error (RMSE) and Mean Absolute Error (MAE).
-
-- **Data Splitting:**  
-  - Use a temporal split—training on data from the earlier months and testing on the most recent period—to mimic a real-world forecasting scenario.
-  - Optionally implement time series cross-validation strategies to ensure robustness.
-
-## Data Visualization
-
-- **Exploratory Analysis:**  
-  - Use **Matplotlib** and **Plotly** to create time series plots of bike usage alongside weather trends.
-  - Generate scatter plots, heatmaps, and correlation matrices to examine relationships between trip counts and features.
-  - Consider interactive dashboards with Plotly if dynamic exploration is needed.
-
-## Testing and Reproducibility
-
-- **Unit and Integration Tests:**  
-  - Write unit tests (using pytest, for example) for critical data processing and feature extraction functions.
-  - Set up a GitHub Actions workflow to automatically run tests on each commit
-
-- **Reproducibility:**  
-  - Document all dependencies in a `requirements.txt` or Conda environment file.
-  - Use Git for version control and consider containerizing the project with Docker to ensure consistency across environments.
-
-## Timeline and Scope
-
-- **Duration:** Two months  
-- **Milestones:**  
-  - **Weeks 1–2:** Collect and clean the Bluebikes trip history and weather data.  
-  - **Weeks 3–4:** Engineer features and conduct exploratory data analysis; create initial visualizations.  
-  - **Weeks 5–6:** Develop and experiment with baseline and advanced predictive models.  
-  - **Week 7-8:** Documentation, Final refinements, evaluation, and preparation for project submission.
-
----
+## Next Steps  
+I’m planning to edit or possibly overhaul the model to make it more understandable and more useful in practical settings. Specifically, I want to develop a version that can predict hourly trip counts using only weather data, the date, and time-based features like whether it’s a holiday, weekend, or rush hour. The goal is to create a model that doesn’t rely on recent trip history, so it can be used in advance to help systems like Bluebikes plan for demand. For example, if the model predicts high ridership on a sunny Saturday, Bluebikes could proactively ensure bikes are well-distributed and available.
